@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Roguish</string>
+
+    <!-- Menu Buttons -->
     <string name="encounter">Encounter</string>
     <string name="view_stash">View Stash</string>
     <string name="credits">Credits</string>
+
+    <!-- Navigation Buttons -->
+    <string name="menu">Menu</string>
+    <string name="stash">Stash</string>
 </resources>
