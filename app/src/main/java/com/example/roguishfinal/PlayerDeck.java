@@ -28,6 +28,7 @@ public class PlayerDeck {
                                 "Attack the enemy for %s",
                                 this.owner.getAttack()
                         ),
+                        "enemy",
                         this.owner::attack
                 )
         );
@@ -38,6 +39,7 @@ public class PlayerDeck {
                                 "Apply %s poison to the enemy.",
                                 this.owner.getMagic()
                         ),
+                        "enemy",
                         this.owner::poison
                 )
         );
@@ -45,6 +47,7 @@ public class PlayerDeck {
                 new Card(
                         "Flood Systems",
                         "Gain 2 Evasion (Take no damage from next attack",
+                        "enemy",
                         this.owner::evade
                 )
         );
@@ -52,7 +55,8 @@ public class PlayerDeck {
                 new Card(
                         "Vita-gel",
                         "Heal for 35 (Can overheal).",
-                        this.owner::evade
+                        "self",
+                        this.owner::heal
                 )
         );
     }
