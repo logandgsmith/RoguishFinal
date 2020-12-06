@@ -6,4 +6,4 @@ Roguish is a rogue-like card game that allows the player to "stash" cards betwee
 
 ## Contributors
 * Logan Smith ([@logandgsmith](https://github.com/logandgsmith))
-* Dalton Taylor 
+* Dalton Taylor ([@daltay](https://github.com/daltay))
