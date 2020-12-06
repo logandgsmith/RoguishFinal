@@ -48,6 +48,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
         <TextView
             android:id="@+id/encounterTitle"
             android:layout_width="match_parent"
@@ -199,16 +203,12 @@
                 android:textColor="#FFFFFF" />
         </LinearLayout>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="8dp" />
-
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/cardArea"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
@@ -266,6 +266,10 @@
             android:onClick="onClickNext"
             android:text="Next"
             android:textColor="#FFFFFF" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
