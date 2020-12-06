@@ -250,6 +250,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorSecondary"
+            android:onClick="onClickSelect"
             android:text="Select"
             android:textColor="#FFFFFF" />
 
@@ -262,6 +263,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorSecondary"
+            android:onClick="onClickNext"
             android:text="Next"
             android:textColor="#FFFFFF" />
     </LinearLayout>
