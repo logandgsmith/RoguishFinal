@@ -28,7 +28,7 @@ public class EnemyDeck {
                                 "Attack the enemy for %s",
                                 this.owner.getAttack()
                         ),
-                        "enemy",
+                        Target.ENEMY,
                         this.owner::attack
                 )
         );
@@ -39,7 +39,7 @@ public class EnemyDeck {
                                 "Apply %s poison to the enemy.",
                                 this.owner.getMagic()
                         ),
-                        "enemy",
+                        Target.ENEMY,
                         this.owner::poison
                 )
         );

@@ -138,9 +138,9 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
                 && this.enemy.getHealth() > 0
                 && acc_x < -0.5
                 && acc_y > 5.0) {
-            if(this.currentCard.getTarget().equals("self"))
+            if(this.currentCard.getTarget().equals(Target.SELF))
                 this.currentCard.playCard.playCard(this.playerDeck.getOwner());
-            else if(this.currentCard.getTarget().equals("enemy"))
+            else if(this.currentCard.getTarget().equals(Target.ENEMY))
                 this.currentCard.playCard.playCard(enemy);
             this.isSelected = false;
 

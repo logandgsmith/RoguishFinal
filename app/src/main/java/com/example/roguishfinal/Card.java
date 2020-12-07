@@ -5,16 +5,21 @@ interface CardFunctionality {
     void playCard(Entity target);
 }
 
+enum Target {
+    SELF,
+    ENEMY
+}
+
 // Represents a single Card in any given Deck
 public class Card {
     // Member variables
     private final String name;
     private final String description;
-    private final String target;
+    private final Target target;
     public final CardFunctionality playCard;
 
     // Constructor
-    public Card(String name, String description, String target, CardFunctionality playCard) {
+    public Card(String name, String description, Target target, CardFunctionality playCard) {
         this.name = name;
         this.description = description;
         this.target = target;
@@ -24,5 +29,5 @@ public class Card {
     // Accessors
     public String getName() { return this.name; }
     public String getDescription() { return this.description; }
-    public String getTarget() { return this.target; }
+    public Target getTarget() { return this.target; }
 }
