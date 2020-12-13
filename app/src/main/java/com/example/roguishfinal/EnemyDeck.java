@@ -3,7 +3,6 @@ package com.example.roguishfinal;
 import java.util.ArrayList;
 
 public class EnemyDeck {
-
     // Member Variables
     private String name;
     private Entity owner;

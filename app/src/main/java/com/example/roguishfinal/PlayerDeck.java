@@ -2,12 +2,9 @@ package com.example.roguishfinal;
 
 import java.util.ArrayList;
 
-public class PlayerDeck {
-    // Member Variables
-    private String name;
-    private Entity owner;
-    private int currentCard = 0;
-    private ArrayList<Card> startingDeck;
+public class PlayerDeck extends Deck {
+    // Additional Variables
+    protected int currentCard = 0;
 
     // Constructor
     public PlayerDeck() {
@@ -18,7 +15,6 @@ public class PlayerDeck {
                 25,
                 5
         );
-        startingDeck = new ArrayList<>();
 
         // Add cards to deck
         startingDeck.add(
@@ -59,30 +55,39 @@ public class PlayerDeck {
                         this.owner::heal
                 )
         );
+
+        this.drawHand();
     }
 
-    // Accessors
-    public String getName() { return this.name; }
-    public Entity getOwner() { return this.owner; }
+    // Return the card in hand
+    public Card getCurrent() {
+        return this.hand.get(currentCard);
+    }
 
+    // Draw a hand of 3 cards (Duplicates are ok)
+    public void drawHand() {
+        if(startingDeck.size() == 0) return;
 
-    public Card getCard(int index) {
-        if(index > this.startingDeck.size() || index < 0) {
-            return null;
+        this.hand.clear();
+
+        for(int i = 0; i < 3; i++) {
+            this.hand.add(getRandomCard());
         }
 
-        return startingDeck.get(index);
+        this.currentCard = 0;
     }
 
-    public Card getCurrent() {
-        return startingDeck.get(currentCard);
-    }
+    // Get the next card from the deck (reverse to get last card)
+    public Card getNext(boolean reverse) {
+        // Find direction to move
+        this.currentCard = reverse ? this.currentCard - 1 : this.currentCard + 1;
 
-    public Card getNext() {
-        this.currentCard++;
-        if(this.currentCard >= this.startingDeck.size())
+        // Handle out of bounds
+        if(this.currentCard >= this.hand.size())
             this.currentCard = 0;
+        else if(this.currentCard < 0)
+            this.currentCard = this.hand.size() - 1;
 
-        return startingDeck.get(currentCard);
+        return this.hand.get(this.currentCard);
     }
 }

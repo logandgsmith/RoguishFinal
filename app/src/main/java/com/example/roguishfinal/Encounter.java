@@ -35,7 +35,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encounter);
 
-        // Accelerometer Setup
+        // Setup Accelerometer
         SensorManager manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if(accelerometer != null) {
@@ -44,6 +44,29 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
                     SensorManager.SENSOR_DELAY_NORMAL,
                     SensorManager.SENSOR_DELAY_UI);
         }
+
+        // Setup listeners for the card area
+        LinearLayout card = (LinearLayout) findViewById(R.id.cardArea);
+        card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectCard();
+            }
+        });
+        card.setOnTouchListener(new OnSwipeTouchListener(this) {
+            public boolean onSwipeRight() {
+                changeCard(true);
+                return true;
+            }
+            public boolean onSwipeLeft() {
+                changeCard(false);
+                return true;
+            }
+        });
+
+        // Setup Activity Pane
+        TextView latestActivity = (TextView) findViewById(R.id.latestActivity);
+        latestActivity.setText("Encountered Xythoid Elite!");
 
         // Setup UI
         this.updateAll();
@@ -59,17 +82,25 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         finish();
     }
 
-    public void onClickSelect(View view) {
+    ///// Mutators /////
+    // Allow the current card to be interacted with
+    public void selectCard() {
         this.isSelected = !this.isSelected;
         updateCard();
+
+        if(isSelected)
+            updateActivity("Selected " + currentCard.getName() + ".");
+        else
+            updateActivity("Unselected " + currentCard.getName() + ".");
     }
 
-    public void onClickNext(View view) {
-        this.currentCard = this.playerDeck.getNext();
+    // Advance (false) or retreat (true) the current card cursor
+    public void changeCard(boolean reverse) {
+        this.currentCard = this.playerDeck.getNext(reverse);
         this.updateCard();
     }
 
-    ///// Mutators /////
+    // Update the card image to the current card
     public void updateCard() {
         Card card = this.currentCard;
         TextView title = (TextView) findViewById(R.id.cardTitle);
@@ -96,6 +127,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         }
     }
 
+    // Change health text to current values
     public void updateHealth() {
         String playerHealthText = "Player Health: " + this.playerDeck.getOwner().getHealth();
         String enemyHealthText = "Enemy Health: " + this.enemy.getHealth();
@@ -108,6 +140,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     }
 
     // TODO: Create a status listener and update the table dynamically
+    // Update statuses with current values
     public void updateStatuses() {
         String playerText = "Evasion: " + this.playerDeck.getOwner().getEvasion();
         String enemyText = "Poison: " + this.enemy.getPoison();
@@ -124,6 +157,11 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         this.updateCard();
         this.updateHealth();
         this.updateStatuses();
+    }
+
+    public void updateActivity(String newActivity) {
+        TextView latestActivity = (TextView) findViewById(R.id.latestActivity);
+        latestActivity.setText(newActivity);
     }
 
     ///// Sensor Listeners /////
@@ -152,22 +190,17 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
             // Upkeep
             this.playerDeck.getOwner().upkeep();
             this.enemy.upkeep();
+            this.playerDeck.drawHand();
             this.updateAll();
 
             // Check for game overs
-            if(this.playerDeck.getOwner().getIsFinished()) {
-                TextView status = (TextView) findViewById(R.id.encounterTitle);
-                status.setText("YOU DIED. Hit Exit.");
-            }
-            else if(this.enemy.getIsFinished()) {
-                TextView status = (TextView) findViewById(R.id.encounterTitle);
-                status.setText("YOU WIN! Hit Exit.");
-            }
+            if(this.playerDeck.getOwner().getIsFinished())
+                updateActivity("YOU DIED. Please hit exit.");
+            else if(this.enemy.getIsFinished())
+                updateActivity("YOU WIN! Please hit exit.");
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int i) { /* Return */ }
 }
