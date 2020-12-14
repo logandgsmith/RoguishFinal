@@ -9,4 +9,7 @@
     <!-- Navigation Buttons -->
     <string name="menu">Menu</string>
     <string name="stash">Stash</string>
+    <string name="instructions">You can play one of the card below instead of your normal move
+        for the turn! Swipe left and right to see all of the cards available. Once you find on
+        you\'d like, tap it to select. Next, tilt your phone away from you to play it.</string>
 </resources>

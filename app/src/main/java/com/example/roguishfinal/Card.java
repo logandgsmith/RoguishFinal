@@ -1,17 +1,19 @@
 package com.example.roguishfinal;
 
+import java.io.Serializable;
+
 // Used to make passing functions easier
-interface CardFunctionality {
+interface CardFunctionality extends Serializable {
     void playCard(Entity target);
 }
 
-enum Target {
+enum Target implements Serializable {
     SELF,
     ENEMY
 }
 
 // Represents a single Card in any given Deck
-public class Card {
+public class Card implements Serializable {
     // Member variables
     private final String name;
     private final String description;

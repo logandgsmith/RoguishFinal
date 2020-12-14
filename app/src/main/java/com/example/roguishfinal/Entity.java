@@ -1,6 +1,8 @@
 package com.example.roguishfinal;
 
-public class Entity {
+import java.io.Serializable;
+
+public class Entity implements Serializable {
     // Member Variables /////
     private final String name;
     private int health;

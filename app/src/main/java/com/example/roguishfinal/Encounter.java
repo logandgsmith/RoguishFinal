@@ -20,6 +20,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     private PlayerDeck playerDeck = new PlayerDeck();
     private boolean isSelected = false;
     private Card currentCard =  playerDeck.getCurrent();
+    private Stasher stasher;
 
     // Enemy Deck
     // TODO: Implement new enemy decks
@@ -68,6 +69,9 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         TextView latestActivity = (TextView) findViewById(R.id.latestActivity);
         latestActivity.setText("Encountered Xythoid Elite!");
 
+        // Setup Stasher
+        this.stasher = new Stasher(this);
+
         // Setup UI
         this.updateAll();
     }
@@ -75,7 +79,27 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     ///// On Click Listeners /////
     public void onClickStash(View view) {
         Intent intent = new Intent(getBaseContext(), Stash.class);
+        intent.putExtra("deck", this.playerDeck);
+        intent.putExtra("enemy", this.enemy);
+        intent.putExtra("encounter", true);
         startActivity(intent);
+
+        // Just attack the player for now
+        // TODO: Make the enemy take a full move
+        if(this.enemy.getHealth() > 0)
+            this.enemy.attack(this.playerDeck.getOwner());
+
+        // Upkeep
+        this.playerDeck.getOwner().upkeep();
+        this.enemy.upkeep();
+        this.playerDeck.drawHand();
+        this.updateAll();
+
+        // Check for game overs
+        if(this.playerDeck.getOwner().getIsFinished())
+            updateActivity("YOU DIED. Please hit exit.");
+        else if(this.enemy.getIsFinished())
+            updateActivity("YOU WIN! Please hit exit.");
     }
 
     public void onClickExit(View view) {
@@ -89,9 +113,9 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         updateCard();
 
         if(isSelected)
-            updateActivity("Selected " + currentCard.getName() + ".");
+            updateActivity("Selected " + currentCard.getName() + ". Tilt away to play or towards to stash.");
         else
-            updateActivity("Unselected " + currentCard.getName() + ".");
+            updateActivity("Unselected " + currentCard.getName() + ". Tilt away to play or towards to stash.");
     }
 
     // Advance (false) or retreat (true) the current card cursor
@@ -198,6 +222,27 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
                 updateActivity("YOU DIED. Please hit exit.");
             else if(this.enemy.getIsFinished())
                 updateActivity("YOU WIN! Please hit exit.");
+        }
+        else if(this.playerDeck.getOwner().getHealth() > 0
+                && this.enemy.getHealth() > 0
+                && this.isSelected
+                && acc_x < -0.5
+                && acc_y < -5.0) {
+            int emptySpace = stasher.findSpace();
+            if(emptySpace < 0)
+                updateActivity("Stash is full! " + currentCard.getName() + " selected.");
+            else {
+                int index = this.playerDeck.getIndex(currentCard);
+                if(index < 0)
+                    updateActivity("Failed to stash Card " + currentCard.getName());
+                else {
+                    updateActivity("Stashed Card: " + currentCard.getName());
+                    stasher.put(emptySpace, index);
+                    this.playerDeck.addPass();
+                }
+            }
+            this.isSelected = false;
+            updateCard();
         }
     }
 

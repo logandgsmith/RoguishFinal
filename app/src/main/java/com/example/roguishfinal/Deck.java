@@ -1,9 +1,10 @@
 package com.example.roguishfinal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class Deck {
+public abstract class Deck implements Serializable {
     // Member Variables
     protected String name;
     protected Entity owner;
@@ -13,6 +14,7 @@ public abstract class Deck {
     // Accessors
     public String getName() { return this.name; }
     public Entity getOwner() { return this.owner; }
+    public ArrayList<Card> getHand() { return this.hand; }
 
     // Return a card by index
     public Card getCard(int index) {
@@ -23,9 +25,16 @@ public abstract class Deck {
         return startingDeck.get(index);
     }
 
-    // Return a random card from the deck
+    public int getIndex(Card card) {
+        if(!this.startingDeck.contains(card))
+            return -1;
+
+        return this.startingDeck.indexOf(card);
+    }
+
+    // Return a random card from the deck (ignores slot 0)
     public Card getRandomCard() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, startingDeck.size());
+        int randomNum = ThreadLocalRandom.current().nextInt(1, startingDeck.size());
         return getCard(randomNum);
     }
 }

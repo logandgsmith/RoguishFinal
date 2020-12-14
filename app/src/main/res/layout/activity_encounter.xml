@@ -16,7 +16,7 @@
         android:layout_marginBottom="8dp"
         android:background="@color/colorSecondary"
         android:onClick="onClickStash"
-        android:text="Stash"
+        android:text="@string/view_stash"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

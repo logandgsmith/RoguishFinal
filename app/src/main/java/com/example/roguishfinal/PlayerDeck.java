@@ -1,7 +1,5 @@
 package com.example.roguishfinal;
 
-import java.util.ArrayList;
-
 public class PlayerDeck extends Deck {
     // Additional Variables
     protected int currentCard = 0;
@@ -18,6 +16,14 @@ public class PlayerDeck extends Deck {
 
         // Add cards to deck
         startingDeck.add(
+                new Card(
+                        "Pass",
+                        "Do nothing and pass the turn.",
+                        Target.ENEMY,
+                        this.owner::attack
+                )
+        );
+         startingDeck.add(
                 new Card(
                         "Strike",
                         String.format(
@@ -75,6 +81,12 @@ public class PlayerDeck extends Deck {
         }
 
         this.currentCard = 0;
+    }
+
+    public void addPass() {
+        int index = this.currentCard;
+        if(index >= 0 && index < this.hand.size())
+            this.hand.set(index, startingDeck.get(0));
     }
 
     // Get the next card from the deck (reverse to get last card)
