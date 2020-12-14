@@ -56,6 +56,15 @@ public class Stasher {
     }
 
     public int findSpace() {
+        try {
+            this.fetchData();
+        }
+        catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
         for(int i = 0; i < this.stashedValues.length; i++) {
             if (this.stashedValues[i] == 0) {
                 return i;
@@ -70,6 +79,7 @@ public class Stasher {
         for (int stashedValue : this.stashedValues)
             valueBuilder.append(stashedValue).append("\n");
         String contents = valueBuilder.toString();
+        Log.d("hr", "contents: " + contents);
 
         try(FileOutputStream outStream =
                     this.context

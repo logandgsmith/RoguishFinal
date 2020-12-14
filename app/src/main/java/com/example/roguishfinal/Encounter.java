@@ -11,25 +11,23 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Encounter extends AppCompatActivity implements SensorEventListener {
     ///// Member Variables /////
     // Player Deck
     private PlayerDeck playerDeck = new PlayerDeck();
     private boolean isSelected = false;
+    private boolean isGameOver = false;
     private Card currentCard =  playerDeck.getCurrent();
     private Stasher stasher;
 
     // Enemy Deck
-    // TODO: Implement new enemy decks
-    private Entity enemy = new Entity(
-            "TestEnemy",
-            100,
-            10,
-            2
-    );
+    private Deck enemyDeck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +63,21 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
             }
         });
 
+        // Choose an enemy
+        ImageView portrait = (ImageView) findViewById(R.id.imageView);
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 2);
+        if(randomNum == 0) {
+            portrait.setBackgroundResource(R.drawable.spacepirate);
+            enemyDeck = new PirateDeck();
+        }
+        else {
+            portrait.setBackgroundResource(R.drawable.doctoralien);
+            enemyDeck = new AlienDeck();
+        }
+
         // Setup Activity Pane
         TextView latestActivity = (TextView) findViewById(R.id.latestActivity);
-        latestActivity.setText("Encountered Xythoid Elite!");
+        latestActivity.setText("Encountered " + enemyDeck.getName() + "!");
 
         // Setup Stasher
         this.stasher = new Stasher(this);
@@ -80,31 +90,52 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     public void onClickStash(View view) {
         Intent intent = new Intent(getBaseContext(), Stash.class);
         intent.putExtra("deck", this.playerDeck);
-        intent.putExtra("enemy", this.enemy);
+        intent.putExtra("enemy", this.enemyDeck.getOwner());
         intent.putExtra("encounter", true);
         startActivity(intent);
 
         // Just attack the player for now
         // TODO: Make the enemy take a full move
-        if(this.enemy.getHealth() > 0)
-            this.enemy.attack(this.playerDeck.getOwner());
+        if(this.enemyDeck.getOwner().getHealth() > 0) {
+            Card enemyMove = this.enemyDeck.getRandomCard();
+            updateActivity(this.enemyDeck.getName() + " used " + enemyMove.getName());
+            if(enemyMove.getTarget().equals(Target.SELF))
+                enemyMove.playCard.playCard(this.enemyDeck.getOwner());
+            else
+                enemyMove.playCard.playCard(this.playerDeck.getOwner());
+        }
+
 
         // Upkeep
-        this.playerDeck.getOwner().upkeep();
-        this.enemy.upkeep();
-        this.playerDeck.drawHand();
-        this.updateAll();
-
-        // Check for game overs
-        if(this.playerDeck.getOwner().getIsFinished())
-            updateActivity("YOU DIED. Please hit exit.");
-        else if(this.enemy.getIsFinished())
-            updateActivity("YOU WIN! Please hit exit.");
+        this.upkeep();
     }
 
     public void onClickExit(View view) {
         finish();
     }
+
+    ///// GAMEPLAY CHECKS /////
+    public void upkeep() {
+        this.playerDeck.getOwner().upkeep();
+        this.enemyDeck.getOwner().upkeep();
+        this.playerDeck.drawHand();
+        this.currentCard = this.playerDeck.hand.get(0);
+        this.updateAll();
+        this.checkForGameOvers();
+    }
+
+    public void checkForGameOvers() {
+        // Check for game overs
+        if(this.playerDeck.getOwner().getIsFinished()) {
+            updateActivity("YOU DIED. Please hit exit.");
+            this.isGameOver = true;
+        }
+        else if(this.enemyDeck.getOwner().getIsFinished()) {
+            updateActivity("YOU WIN! Please hit exit.");
+            this.isGameOver = true;
+        }
+    }
+
 
     ///// Mutators /////
     // Allow the current card to be interacted with
@@ -154,7 +185,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     // Change health text to current values
     public void updateHealth() {
         String playerHealthText = "Player Health: " + this.playerDeck.getOwner().getHealth();
-        String enemyHealthText = "Enemy Health: " + this.enemy.getHealth();
+        String enemyHealthText = "Enemy Health: " + this.enemyDeck.getOwner().getHealth();
 
         TextView playerHealth = (TextView) findViewById(R.id.playerHealth);
         playerHealth.setText(playerHealthText);
@@ -167,7 +198,7 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     // Update statuses with current values
     public void updateStatuses() {
         String playerText = "Evasion: " + this.playerDeck.getOwner().getEvasion();
-        String enemyText = "Poison: " + this.enemy.getPoison();
+        String enemyText = "Poison: " + this.enemyDeck.getOwner().getPoison();
 
         TextView playerHealth = (TextView) findViewById(R.id.playerEffectOne);
         playerHealth.setText(playerText);
@@ -184,6 +215,9 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
     }
 
     public void updateActivity(String newActivity) {
+        if(isGameOver)
+            return;
+
         TextView latestActivity = (TextView) findViewById(R.id.latestActivity);
         latestActivity.setText(newActivity);
     }
@@ -197,51 +231,49 @@ public class Encounter extends AppCompatActivity implements SensorEventListener 
         // Attempt to play the card
         if (this.playerDeck.getOwner().getHealth() > 0
                 && this.isSelected
-                && this.enemy.getHealth() > 0
+                && this.enemyDeck.getOwner().getHealth() > 0
                 && acc_x < -0.5
                 && acc_y > 5.0) {
             if(this.currentCard.getTarget().equals(Target.SELF))
                 this.currentCard.playCard.playCard(this.playerDeck.getOwner());
             else if(this.currentCard.getTarget().equals(Target.ENEMY))
-                this.currentCard.playCard.playCard(enemy);
+                this.currentCard.playCard.playCard(this.enemyDeck.getOwner());
             this.isSelected = false;
 
             // Just attack the player for now
-            // TODO: Make the enemy take a full move
-            if(this.enemy.getHealth() > 0)
-                this.enemy.attack(this.playerDeck.getOwner());
+            if(this.enemyDeck.getOwner().getHealth() > 0) {
+                Card enemyMove = this.enemyDeck.getRandomCard();
+                updateActivity(this.enemyDeck.getName() + " used " + enemyMove.getName());
+                if(enemyMove.getTarget().equals(Target.SELF))
+                    enemyMove.playCard.playCard(this.enemyDeck.getOwner());
+                else
+                    enemyMove.playCard.playCard(this.playerDeck.getOwner());
+            }
 
             // Upkeep
-            this.playerDeck.getOwner().upkeep();
-            this.enemy.upkeep();
-            this.playerDeck.drawHand();
-            this.updateAll();
-
-            // Check for game overs
-            if(this.playerDeck.getOwner().getIsFinished())
-                updateActivity("YOU DIED. Please hit exit.");
-            else if(this.enemy.getIsFinished())
-                updateActivity("YOU WIN! Please hit exit.");
+            this.upkeep();
         }
         else if(this.playerDeck.getOwner().getHealth() > 0
-                && this.enemy.getHealth() > 0
+                && this.enemyDeck.getOwner().getHealth() > 0
                 && this.isSelected
                 && acc_x < -0.5
                 && acc_y < -5.0) {
             int emptySpace = stasher.findSpace();
-            if(emptySpace < 0)
+            if(emptySpace < 0) {
                 updateActivity("Stash is full! " + currentCard.getName() + " selected.");
+                this.isSelected = false;
+            }
             else {
                 int index = this.playerDeck.getIndex(currentCard);
                 if(index < 0)
                     updateActivity("Failed to stash Card " + currentCard.getName());
                 else {
-                    updateActivity("Stashed Card: " + currentCard.getName());
+                    updateActivity("Stashed Card: " + currentCard.getName() + " to slot " + emptySpace);
                     stasher.put(emptySpace, index);
-                    this.playerDeck.addPass();
+                    this.currentCard = this.playerDeck.addPass();
+                    this.isSelected = false;
                 }
             }
-            this.isSelected = false;
             updateCard();
         }
     }

@@ -11,6 +11,9 @@ public class Entity implements Serializable {
 
     private int poison = 0;
     private int evasion = 0;
+    private int charge = 0;
+    private int armor = 0;
+
     private boolean isFinished = false;
 
     ///// Constructor /////
@@ -30,11 +33,17 @@ public class Entity implements Serializable {
     // Effects
     public int getEvasion() { return this.evasion; }
     public int getPoison() { return this.poison; }
+    public int getCharge() { return this.charge; }
+    public int getArmor() { return this.armor; }
 
     // States
     public boolean getIsFinished() { return this.isFinished; }
 
     ///// Mutators /////
+    public void breakArmor() {
+        this.armor = 0;
+    }
+
     // Wrapper when an attack could be evaded
     public void takeAttack(int damage) {
         if(this.evasion > 0)
@@ -68,7 +77,18 @@ public class Entity implements Serializable {
 
     // Actions
     public void attack(Entity target) {
-        target.takeAttack(this.attack);
+        int weightedAttack = this.attack;
+        if(this.charge > 0) {
+            weightedAttack = (this.charge + 1)  * attack;
+            this.charge--;
+        }
+
+        if(target.getArmor() > 0) {
+            weightedAttack -= target.armor;
+            target.breakArmor();
+        }
+
+        target.takeAttack(weightedAttack);
     }
 
     public void poison(Entity target) {
@@ -81,5 +101,22 @@ public class Entity implements Serializable {
 
     public void heal(Entity target) {
         target.takeDamage(-30);
+    }
+
+    public void naniteAttack(Entity target) {
+        target.takeAttack(this.attack);
+        this.health += 5;
+    }
+
+    public void nanoCharge(Entity target) {
+        this.charge += 1;
+    }
+
+    public void overwhelmingForce(Entity target) {
+        target.takeAttack(this.attack + this.magic);
+    }
+
+    public void unnaturalDefenses(Entity target) {
+        this.armor += this.magic;
     }
 }

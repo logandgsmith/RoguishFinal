@@ -16,7 +16,23 @@ public class MainActivity extends AppCompatActivity {
 
     // Routes for buttons
     public void onClickStash(View view) {
+        Entity tempPlayer = new Entity(
+                "temp",
+                100,
+                0,
+                0
+        );
+        Entity tempEnemy = new Entity(
+                "temp",
+                100,
+                0,
+                0
+        );
+        PlayerDeck deck = new PlayerDeck();
+
         Intent intent = new Intent(getBaseContext(), Stash.class);
+        intent.putExtra("deck", deck);
+        intent.putExtra("encounter", false);
         startActivity(intent);
     }
 

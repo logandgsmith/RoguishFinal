@@ -83,10 +83,12 @@ public class PlayerDeck extends Deck {
         this.currentCard = 0;
     }
 
-    public void addPass() {
+    public Card addPass() {
         int index = this.currentCard;
         if(index >= 0 && index < this.hand.size())
-            this.hand.set(index, startingDeck.get(0));
+            this.hand.set(index, this.startingDeck.get(0));
+
+        return this.startingDeck.get(0);
     }
 
     // Get the next card from the deck (reverse to get last card)

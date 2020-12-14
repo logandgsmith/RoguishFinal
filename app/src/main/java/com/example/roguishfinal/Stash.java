@@ -151,6 +151,8 @@ public class Stash extends AppCompatActivity implements SensorEventListener {
             e.printStackTrace();
         }
 
+        this.currentCard = this.deck.getCard(this.stasher.stashedValues[this.cardSelection]);
+
         // Stash titles
         TextView stashTitle = (TextView) findViewById(R.id.stashCardTitle);
         stashTitle.setText(this.deck.getCard(this.stasher.stashedValues[this.cardSelection]).getName());
@@ -163,13 +165,14 @@ public class Stash extends AppCompatActivity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         float acc_x = sensorEvent.values[1];
-        if(this.inEncounter && cardSelection >= 0 && acc_x < -3.0) {
+        if(this.inEncounter && this.isSelected && cardSelection >= 0 && acc_x < -3.0) {
             if(this.currentCard.getTarget().equals(Target.SELF))
                 this.currentCard.playCard.playCard(this.deck.getOwner());
-            else if(this.currentCard.getTarget().equals(Target.ENEMY))
-                this.currentCard.playCard.playCard(enemy);
+            else
+                this.currentCard.playCard.playCard(this.enemy);
 
             this.stasher.put(cardSelection, 0);
+            this.isSelected = false;
             finish();
         }
     }

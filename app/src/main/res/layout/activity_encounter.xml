@@ -66,8 +66,7 @@
             android:id="@+id/imageView"
             android:layout_width="280dp"
             android:layout_height="280dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/doctoralien" />
+            android:layout_gravity="center_horizontal" />
 
         <Space
             android:layout_width="match_parent"
